@@ -7,17 +7,39 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import os
+
 BOT_NAME = "newscraper"
 
 SPIDER_MODULES = ["newscraper.spiders"]
 NEWSPIDER_MODULE = "newscraper.spiders"
 
+SCRAPEOPS_API_KEY = os.getenv("SCRAPEOPS_API_KEY")
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+SCRAPEOPS_FAKE_BROWSER_HEADER_ENDPOINT = 'https://headers.scrapeops.io/v1/browser-headers'
+SCRAPEOPS_FAKE_BROWSER_HEADER_ENABLE = True
+SCRAPEOPS_NUM_RESULT = 50
+
+import requests
+import json
+
+
+# ROTATING_PROXY_LIST = [
+#     "201.212.248.186:8080",
+# ]
+
+DOWNLOADER_MIDDLEWARES = {
+    'newscraper.middlewares.ScrapeOpsFakeBrowserHeaderAgentMiddleware': 400, # the fake browser header middleware includes the fake user agent middleware
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+}
+
+
+# # Crawl responsibly by identifying yourself (and your website) on the user-agent
+# USER_AGENT = 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -44,9 +66,9 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
-#    "newscraper.middlewares.NewscraperSpiderMiddleware": 543,
-#}
+SPIDER_MIDDLEWARES = {
+   "newscraper.middlewares.NewscraperSpiderMiddleware": 543,
+}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -62,9 +84,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "newscraper.pipelines.NewscraperPipeline": 300,
-#}
+ITEM_PIPELINES = {
+   "newscraper.pipelines.NewscraperPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

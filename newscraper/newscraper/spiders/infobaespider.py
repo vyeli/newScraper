@@ -1,19 +1,16 @@
 import scrapy
 from newscraper.items import NewItem
 
-
-
-custom_settings = {
-    "FEEDS": {
-        "infobaedata.json": {"format": "json", "overwrite": True},
-    }
-}
-
-
 class InfobaeSpider(scrapy.Spider):
-    name = "infobae"
+    name = "infobaespider"
     allowed_domains = ["infobae.com"]
     start_urls = ["https://www.infobae.com/politica"]
+
+    custom_settings = {
+    "FEEDS": {
+        "data/infobae/politica_%(time)s.json": {"format": "json"},
+    }
+}
 
     def parse(self, response):
        news = response.css("a.feed-list-card")
@@ -28,8 +25,8 @@ class InfobaeSpider(scrapy.Spider):
         new_item["url"] = response.url
         new_item["title"] = response.css("h1.article-headline::text").get()
         new_item["subtitle"] = response.css("h2.article-subheadline::text").get()
-        new_item["date"] = response.css("span.sharebar-article-date::text").get()
-        new_item["body"] = response.css("div.body-nota p::text").getall()
+        new_item["date"] = response.css("span.sharebar-article-date::text").getall()
+        new_item["body"] = response.css("p.paragraph").getall()
 
         yield new_item
 
