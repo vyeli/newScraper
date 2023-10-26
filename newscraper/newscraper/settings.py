@@ -20,9 +20,8 @@ SCRAPEOPS_FAKE_BROWSER_HEADER_ENDPOINT = 'https://headers.scrapeops.io/v1/browse
 SCRAPEOPS_FAKE_BROWSER_HEADER_ENABLE = True
 SCRAPEOPS_NUM_RESULT = 50
 
-import requests
-import json
-
+MONGODB_URI = os.getenv("MONGODB_ATLAS_CLUSTER_URI")
+MONGODB_DBNAME = "news"
 
 # ROTATING_PROXY_LIST = [
 #     "201.212.248.186:8080",
@@ -86,6 +85,7 @@ SPIDER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    "newscraper.pipelines.NewscraperPipeline": 300,
+   "newscraper.pipelines.MongoPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

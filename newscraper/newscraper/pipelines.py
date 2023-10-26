@@ -6,7 +6,6 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from bs4 import BeautifulSoup
 
 from dateutil import parser, tz
 from datetime import timedelta
@@ -32,3 +31,34 @@ class NewscraperPipeline:
             adapter["date"] = formatted_time_arg
 
         return item
+
+
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+from .items import NewItem
+
+class MongoPipeline():
+
+    def __init__(self, mongodburi):
+        self.mongodburi = mongodburi
+        self.mongodb_dbname = "news"
+        self.collection = "articles"
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongodburi=crawler.settings.get("MONGODB_URI"),
+        )
+
+    def open_spider(self, spider):
+        self.client = MongoClient(self.mongodburi)
+        self.db = self.client[self.mongodb_dbname]
+
+    
+    def process_item(self, item, spider):
+        data = dict(NewItem(item))
+        self.db[self.collection].insert_one(data)
+        return item
+
+    def close_spider(self, spider):
+        self.client.close()
